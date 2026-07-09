@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PixelPal — Coordinate Picker</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #1e1e28; color: #eee; margin: 0; padding: 20px; }
+  h1 { font-size: 18px; margin-bottom: 4px; }
+  p { color: #aaa; font-size: 14px; }
+  #dropzone {
+    border: 2px dashed #555; border-radius: 10px; padding: 30px; text-align: center;
+    margin: 16px 0; cursor: pointer; color: #999;
+  }
+  #dropzone.hover { border-color: #6cf; color: #6cf; }
+  #canvasWrap { position: relative; display: inline-block; }
+  canvas { border: 1px solid #444; cursor: crosshair; image-rendering: pixelated; }
+  #coords { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px; font-size: 12px; pointer-events: none; }
+  #log { margin-top: 16px; background: #12121a; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 13px; white-space: pre-wrap; min-height: 60px; }
+  #controls { margin: 10px 0; }
+  button { background: #333; color: #eee; border: 1px solid #555; padding: 6px 14px; border-radius: 6px; cursor: pointer; margin-right: 8px; }
+  button:hover { background: #444; }
+  .point-label { position: absolute; background: #ff5566; color: white; font-size: 10px; padding: 1px 5px; border-radius: 8px; transform: translate(-50%, -130%); pointer-events: none; }
+  .point-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #ff5566; border: 1px solid white; transform: translate(-50%, -50%); pointer-events: none; }
+  select, input[type=range] { vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<h1>PixelPal Coordinate Picker</h1>
+<p>Load your char pack image, click on a point (left eye, right eye, mouth, head-tilt pivot...), and get exact pixel coordinates to paste into config.json.</p>
+
+<div id="dropzone">Click to choose an image, or drag-and-drop it here</div>
+<input type="file" id="fileInput" accept="image/*" style="display:none">
+
+<div id="controls" style="display:none">
+  Label next click as:
+  <select id="labelSelect">
+    <option value="left eye">left eye</option>
+    <option value="right eye">right eye</option>
+    <option value="mouth / expression anchor">mouth / expression anchor</option>
+    <option value="head_tilt pivot">head_tilt pivot</option>
+    <option value="custom point">custom point</option>
+  </select>
+  Zoom:
+  <input type="range" id="zoom" min="1" max="6" step="0.5" value="2">
+  <span id="zoomLabel">2x</span>
+  <button id="clearBtn">Clear points</button>
+</div>
+
+<div id="canvasWrap" style="display:none">
+  <canvas id="canvas"></canvas>
+</div>
+
+<div id="log">Click points will appear here as JSON you can paste directly into config.json.</div>
+
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const canvasWrap = document.getElementById('canvasWrap');
+const controls = document.getElementById('controls');
+const logEl = document.getElementById('log');
+const labelSelect = document.getElementById('labelSelect');
+const zoomSlider = document.getElementById('zoom');
+const zoomLabel = document.getElementById('zoomLabel');
+const clearBtn = document.getElementById('clearBtn');
+
+let img = new Image();
+let naturalW = 0, naturalH = 0;
+let zoom = parseFloat(zoomSlider.value);
+let points = []; // {label, x, y}
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('hover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('hover'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('hover');
+  if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length) loadFile(fileInput.files[0]);
+});
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    img = new Image();
+    img.onload = () => {
+      naturalW = img.naturalWidth;
+      naturalH = img.naturalHeight;
+      points = [];
+      draw();
+      canvasWrap.style.display = 'inline-block';
+      controls.style.display = 'block';
+      dropzone.textContent = `Loaded: ${file.name} (${naturalW}x${naturalH}px) — click to load a different image`;
+      updateLog();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+zoomSlider.addEventListener('input', () => {
+  zoom = parseFloat(zoomSlider.value);
+  zoomLabel.textContent = zoom + 'x';
+  draw();
+});
+
+clearBtn.addEventListener('click', () => { points = []; draw(); updateLog(); });
+
+function draw() {
+  if (!naturalW) return;
+  canvas.width = naturalW * zoom;
+  canvas.height = naturalH * zoom;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  // redraw point markers as plain canvas dots + labels (crisper than DOM overlay at any zoom)
+  ctx.font = '12px sans-serif';
+  points.forEach(p => {
+    const cx = p.x * zoom, cy = p.y * zoom;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff5566';
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+    ctx.fillStyle = '#ff5566';
+    ctx.fillText(p.label + ` (${p.x}, ${p.y})`, cx + 8, cy - 8);
+  });
+}
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const canvasX = (e.clientX - rect.left) * scaleX;
+  const canvasY = (e.clientY - rect.top) * scaleY;
+  const x = Math.round(canvasX / zoom);
+  const y = Math.round(canvasY / zoom);
+
+  points.push({ label: labelSelect.value, x, y });
+  draw();
+  updateLog();
+});
+
+function updateLog() {
+  if (!points.length) {
+    logEl.textContent = 'Click points will appear here as JSON you can paste directly into config.json.';
+    return;
+  }
+  const lines = points.map(p => `  "${p.label}": { "x": ${p.x}, "y": ${p.y} }`);
+  logEl.textContent = '{\n' + lines.join(',\n') + '\n}\n\n' +
+    '(image size: ' + naturalW + ' x ' + naturalH + 'px)';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.spec.bak
+
+# PyInstaller output
+packaging/pyinstaller/build/
+packaging/pyinstaller/dist/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# User-local config (never ship a real user's settings)
+config.ini
+reminders.json
+
+# Editors
+.vscode/
+.idea/
+*.swp

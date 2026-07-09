@@ -1,0 +1,21 @@
+# Windows build environment for PyInstaller packaging.
+#
+# IMPORTANT: this requires Docker Desktop switched to "Windows containers"
+# mode, running on a Windows host — Windows containers cannot run on
+# Linux/macOS Docker hosts. If you're not already on Windows, use the
+# `build-release.yml` GitHub Actions workflow instead (it builds natively
+# on a windows-latest runner, which is the recommended path).
+#
+# Usage (on a Windows host, Windows containers enabled):
+#   docker compose -f packaging/docker-compose.windows.yml run --rm build-windows
+services:
+  build-windows:
+    image: python:3.11-windowsservercore
+    working_dir: C:\src
+    volumes:
+      - ..:C:\src
+    command: >
+      powershell -Command "
+        pip install --no-cache-dir -e '.[dev]';
+        pyinstaller packaging\\pyinstaller\\windows.spec
+      "

@@ -1,0 +1,13 @@
+{
+  "name": "turtle",
+  "display_name": "Turtle",
+  "body": "body.png",
+  "eyes": {
+    "left":  { "x": 77, "y": 40, "radius": 6, "damping": 0.15 },
+    "right": { "x": 119, "y": 42, "radius": 6, "damping": 0.15 },
+    "pupil": "pupil.png"
+  },
+  "ears": {
+    "enabled": false
+  }
+}

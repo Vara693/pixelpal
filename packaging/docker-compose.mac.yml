@@ -1,0 +1,18 @@
+# macOS packaging cannot be done in a Docker container: Apple's license
+# terms prohibit running macOS in virtualized/containerized environments
+# except on genuine Apple hardware, and there is no official "macOS in
+# Docker" base image. This file exists as a documented placeholder so the
+# packaging/ directory mirrors linux/windows, and to point you at the
+# actual supported paths:
+#
+#   1. Local build on a real Mac:
+#        pip install -e ".[dev]"
+#        pyinstaller packaging/pyinstaller/macos.spec
+#
+#   2. CI build on a hosted macOS runner:
+#        see .github/workflows/build-release.yml, which uses
+#        `runs-on: macos-latest` for exactly this reason.
+#
+# There is intentionally no `services:` block here — attempting to run
+# this file with `docker compose` will fail loudly rather than silently
+# producing a broken build.

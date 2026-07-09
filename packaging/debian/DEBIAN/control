@@ -1,0 +1,15 @@
+Package: pixelpal
+Version: 0.1.0
+Section: misc
+Priority: optional
+Architecture: amd64
+Depends: python3 (>= 3.10), python3-pip, libgl1, libegl1, libxkbcommon-x11-0, libxcb-cursor0, libxcb-icccm4, libxcb-image0, libxcb-keysyms1, libxcb-randr0, libxcb-render-util0, libxcb-shape0, libxcb-xinerama0
+Maintainer: PixelPal contributors <noreply@example.com>
+Homepage: https://github.com/yourname/pixelpal
+Description: Layered, cursor-tracking desktop pet overlay
+ PixelPal is a lightweight, frameless, always-on-top desktop pet with
+ layered cursor-tracking eyes, a reactive mood system driven by real
+ system signals, multi-pet awareness, and swappable character packs.
+ .
+ This package installs the PyInstaller-built onedir bundle to
+ /opt/pixelpal and a launcher script to /usr/bin/pixelpal.

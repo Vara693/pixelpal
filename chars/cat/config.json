@@ -1,0 +1,14 @@
+{
+  "name": "cat",
+  "display_name": "Cat",
+  "body": "body.png",
+  "eyes": {
+    "left":  { "x": 82.7, "y": 97.3, "radius": 5.2, "damping": 0.18 },
+    "right": { "x": 130.3, "y": 99.1, "radius": 5.2, "damping": 0.18 },
+    "pupil": "pupil.png",
+    "closed": "eye_closed.png"
+  },
+  "ears": {
+    "enabled": false
+  }
+}

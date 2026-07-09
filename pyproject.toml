@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pixelpal"
+version = "0.1.0"
+description = "A layered, cursor-tracking desktop pet with a reactive mood system"
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+requires-python = ">=3.10"
+authors = [{ name = "PixelPal contributors" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Environment :: X11 Applications :: Qt",
+    "Topic :: Desktop Environment",
+]
+dependencies = [
+    "PySide6>=6.6.0",
+    "Pillow>=10.0.0",
+    "pynput>=1.7.6",
+    "psutil>=5.9.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pyinstaller>=6.3.0",
+]
+
+[project.scripts]
+pixelpal = "pixelpal.main:main"
+
+[tool.setuptools]
+packages = ["pixelpal"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

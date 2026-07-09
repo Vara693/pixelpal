@@ -1,0 +1,25 @@
+{
+  "name": "fox",
+  "display_name": "Fox",
+  "body": "body.gif",
+  "wait_seconds": 5,
+  "eyes": {
+    "left":  { "x": 36, "y": 46, "radius": 6, "damping": 0.15 },
+    "right": { "x": 60, "y": 46, "radius": 6, "damping": 0.15 },
+    "pupil": "pupil.png",
+    "closed": "eye_closed.png"
+  },
+  "head_tilt": {
+    "enabled": true,
+    "max_degrees": 6,
+    "pivot": { "x": 48, "y": 60 }
+  },
+  "ears": {
+    "enabled": false
+  },
+  "expressions": {
+    "happy": "expressions/happy.png",
+    "worried": "expressions/worried.png",
+    "sleepy": "expressions/sleepy.png"
+  }
+}

@@ -1,0 +1,24 @@
+# Reproducible Linux build environment for PyInstaller packaging.
+# Usage (from repo root):
+#   docker compose -f packaging/docker-compose.yml run --rm build-linux
+#
+# Output lands in dist/ on the host via the bind mount.
+services:
+  build-linux:
+    image: python:3.11-slim-bookworm
+    working_dir: /src
+    volumes:
+      - ..:/src
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+    command: >
+      bash -c "
+        apt-get update &&
+        apt-get install -y --no-install-recommends
+          libgl1 libegl1 libxkbcommon0 libxkbcommon-x11-0
+          libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1
+          libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0
+          libdbus-1-3 &&
+        pip install --no-cache-dir -e '.[dev]' &&
+        pyinstaller packaging/pyinstaller/linux.spec
+      "

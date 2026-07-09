@@ -3,7 +3,7 @@
   "display_name": "Owl",
   "body": "body.gif",
   "eyes": {
-    "left":  { "x": 36, "y": 46, "radius": 7, "damping": 0.12 },
+    "left":  { "x": 36, "y": 45, "radius": 7, "damping": 0.12 },
     "right": { "x": 60, "y": 46, "radius": 7, "damping": 0.12 },
     "pupil": "pupil.png"
   }

@@ -37,7 +37,7 @@ as alive rather than as a video clip stuck to your screen.
 ### Quick start (recommended)
 
 ```bash
-git clone https://github.com/yourname/pixelpal.git
+git clone https://github.com/Vara693/pixelpal.git
 cd pixelpal
 ./run.sh        # macOS/Linux
 # or

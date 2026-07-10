@@ -25,6 +25,7 @@ from pixelpal.core.overlay_window import OverlayWindow
 from pixelpal.features.activity_tracker import ActivityTracker
 from pixelpal.features.chat_window import ChatWindow
 from pixelpal.features.ollama_chat import DEFAULT_HOST, DEFAULT_MODEL
+from pixelpal.features.reminder_dialog import ReminderDialog
 from pixelpal.features.reminders import ReminderScheduler, load_reminders, save_reminders
 from pixelpal.mood.signals.battery_signal import BatterySignal
 from pixelpal.mood.signals.cpu_signal import CpuSignal
@@ -88,6 +89,8 @@ class PixelPalApp:
         self.window: OverlayWindow | None = None
         self.chat_window: ChatWindow | None = None
         self._reminder_scheduler = None
+        self.reminders: list = []
+        self.reminder_dialog: ReminderDialog | None = None
 
         self._launch_character()
         self._setup_reminders()
@@ -121,7 +124,7 @@ class PixelPalApp:
         self.window.set_callbacks(
             on_quit=self.app.quit,
             on_switch_character=self._switch_character,
-            on_open_reminders=self._open_reminders_placeholder,
+            on_open_reminders=self._open_reminders_dialog,
             on_open_ollama_settings=self._open_ollama_settings_placeholder,
             on_open_chat=self._open_chat,
             on_install_char_pack=self._install_char_pack,
@@ -155,7 +158,7 @@ class PixelPalApp:
         self.window.set_callbacks(
             on_quit=self.app.quit,
             on_switch_character=self._switch_character,
-            on_open_reminders=self._open_reminders_placeholder,
+            on_open_reminders=self._open_reminders_dialog,
             on_open_ollama_settings=self._open_ollama_settings_placeholder,
             on_open_chat=self._open_chat,
             on_install_char_pack=self._install_char_pack,
@@ -183,21 +186,11 @@ class PixelPalApp:
         self.chat_window = ChatWindow(self.window.pack.config.display_name, host=host, model=model)
         self.chat_window.show()
 
-    def _open_reminders_placeholder(self) -> None:
-        # A full reminders-editing dialog is intentionally out of scope
-        # for this pass; reminders.json can be hand-edited or the
-        # add_daily_reminder / add_one_shot_reminder helpers used from
-        # a script. This shows the current reminders as a quick summary.
-        reminders = load_reminders()
-        if not reminders:
-            QMessageBox.information(
-                None, "Reminders",
-                "No reminders configured yet.\n\nAdd them via reminders.json in your config "
-                "directory, or extend this dialog — see features/reminders.py."
-            )
-            return
-        lines = [f"- [{r.kind}] {r.when}: {r.message}" for r in reminders]
-        QMessageBox.information(None, "Reminders", "\n".join(lines))
+    def _open_reminders_dialog(self) -> None:
+        if self.reminder_dialog is not None:
+            self.reminder_dialog.close()
+        self.reminder_dialog = ReminderDialog(self.reminders)
+        self.reminder_dialog.show()
 
     def _open_ollama_settings_placeholder(self) -> None:
         host = self.config_store.get("ollama", "host", DEFAULT_HOST)
@@ -209,10 +202,13 @@ class PixelPalApp:
         )
 
     def _setup_reminders(self) -> None:
-        if not self.config_store.get_bool("reminders", "enabled", True):
-            return
+        self.reminders = load_reminders()
 
-        reminders = load_reminders()
+        if not self.config_store.get_bool("reminders", "enabled", True):
+            # Reminders can still be added/viewed via the dialog even
+            # with the background checker off — they just won't fire
+            # until [reminders] enabled = true in config.ini.
+            return
 
         def fire(reminder) -> None:  # noqa: ANN001
             from pixelpal.features.banner_widget import BannerWidget
@@ -220,9 +216,9 @@ class PixelPalApp:
             banner = BannerWidget(reminder.message)
             banner.show_and_animate()
             self._active_banner = banner  # keep a reference alive
-            save_reminders(reminders)
+            save_reminders(self.reminders)
 
-        self._reminder_scheduler = ReminderScheduler(reminders, fire)
+        self._reminder_scheduler = ReminderScheduler(self.reminders, fire)
 
         self._reminder_timer = QTimer()
         self._reminder_timer.timeout.connect(self._reminder_scheduler.check)

@@ -26,9 +26,9 @@ FULL_VALID = {
     "head_tilt": {"enabled": True, "max_degrees": 6, "pivot": {"x": 46, "y": 40}},
     "ears": {"enabled": False},
     "expressions": {
-        "happy": "expressions/happy.png",
-        "worried": "expressions/worried.png",
-        "sleepy": "expressions/sleepy.png",
+        "happy": {"path": "expressions/happy.png", "x": 46, "y": 55},
+        "worried": {"path": "expressions/worried.png", "x": 46, "y": 55},
+        "sleepy": {"path": "expressions/sleepy.png", "x": 46, "y": 55},
     },
 }
 
@@ -49,7 +49,9 @@ def test_full_valid_config_parses():
     assert config.head_tilt.max_degrees == 6
     assert config.head_tilt.pivot_x == 46
     assert config.eyes.closed == "eye_closed.png"
-    assert config.expressions["happy"] == "expressions/happy.png"
+    assert config.expressions["happy"].path == "expressions/happy.png"
+    assert config.expressions["happy"].x == 46
+    assert config.expressions["happy"].y == 55
 
 
 def test_missing_name_raises():

@@ -18,8 +18,10 @@
     "enabled": false
   },
   "expressions": {
-    "happy": "expressions/happy.png",
-    "worried": "expressions/worried.png",
-    "sleepy": "expressions/sleepy.png"
+    "happy":   { "path": "expressions/happy.png",   "x": 48, "y": 62 },
+    "worried": { "path": "expressions/worried.png", "x": 48, "y": 62 },
+    "alert":   { "path": "expressions/alert.png",   "x": 48, "y": 62 },
+    "excited": { "path": "expressions/excited.png", "x": 48, "y": 62 },
+    "sleepy":  { "path": "expressions/sleepy.png",  "x": 48, "y": 62 }
   }
 }

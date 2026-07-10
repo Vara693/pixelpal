@@ -110,10 +110,9 @@ class OverlayWindow(QWidget):
             )
 
         self.expression_layer = ExpressionLayer(
-            {mood: self.pack.expression_path(mood) for mood in cfg.expressions},
+            {mood: self.pack.expression_anchor(mood) for mood in cfg.expressions},
             parent=self,
         )
-        self.expression_layer.move(0, 0)
         self.expression_layer.raise_()
 
         self.ear_layer = None

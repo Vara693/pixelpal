@@ -50,9 +50,16 @@ class ChatWindow(QWidget):
 
         layout = QVBoxLayout(self)
 
+        status_row = QHBoxLayout()
         self.status_label = QLabel("")
         self.status_label.setStyleSheet("color: gray; font-size: 11px;")
-        layout.addWidget(self.status_label)
+        status_row.addWidget(self.status_label, stretch=1)
+
+        self.retry_button = QPushButton("Retry connection")
+        self.retry_button.setStyleSheet("font-size: 11px; padding: 2px 8px;")
+        self.retry_button.clicked.connect(self._check_availability)
+        status_row.addWidget(self.retry_button)
+        layout.addLayout(status_row)
 
         self.transcript = QTextEdit()
         self.transcript.setReadOnly(True)
@@ -73,13 +80,20 @@ class ChatWindow(QWidget):
         self._check_availability()
 
     def _check_availability(self) -> None:
+        self.status_label.setText("Checking connection...")
+        self.retry_button.setEnabled(False)
+        # Quick synchronous check (3s timeout in OllamaClient) — a brief
+        # UI pause here is an acceptable tradeoff for keeping this simple;
+        # the send-path itself still runs off-thread via _ChatWorker.
         if self.client.is_available():
             self.status_label.setText(f"Connected to Ollama ({self.client.model})")
+            self.send_button.setEnabled(True)
         else:
             self.status_label.setText(
-                "⚠ Ollama not reachable — run `ollama serve` locally to chat."
+                "⚠ Ollama not reachable — start it, then click Retry."
             )
             self.send_button.setEnabled(False)
+        self.retry_button.setEnabled(True)
 
     def _append_line(self, speaker: str, text: str) -> None:
         self.transcript.append(f"<b>{speaker}:</b> {text}")

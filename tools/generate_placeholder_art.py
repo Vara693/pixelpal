@@ -97,6 +97,13 @@ def make_expression(path, kind, width=28, height=14):
         d.line([(width - 6, 2), (width - 12, 6)], fill=(30, 20, 10, 255), width=2)
     elif kind == "sleepy":
         d.line([(4, height // 2), (width - 4, height // 2)], fill=(30, 20, 10, 255), width=2)
+    elif kind == "alert":
+        d.line([(4, 2), (11, 0)], fill=(30, 20, 10, 255), width=2)
+        d.line([(width - 4, 2), (width - 11, 0)], fill=(30, 20, 10, 255), width=2)
+        d.ellipse([width / 2 - 4, height - 10, width / 2 + 4, height - 2], outline=(30, 20, 10, 255), width=2)
+    elif kind == "excited":
+        d.pieslice([2, -8, width - 2, height + 6], start=10, end=170, fill=(30, 20, 10, 255))
+        d.pieslice([5, -8, width - 5, height], start=10, end=170, fill=(255, 255, 255, 255))
     img.save(path)
 
 
@@ -110,7 +117,7 @@ def build_character(name, base_color, ear_shape_fn):
     make_pupil(os.path.join(out_dir, "pupil.png"))
     make_closed_eye(os.path.join(out_dir, "eye_closed.png"))
 
-    for mood in ("happy", "worried", "sleepy"):
+    for mood in ("happy", "worried", "sleepy", "alert", "excited"):
         make_expression(os.path.join(out_dir, "expressions", f"{mood}.png"), mood)
 
 

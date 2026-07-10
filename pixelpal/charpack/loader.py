@@ -35,8 +35,15 @@ class LoadedCharPack:
         return None
 
     def expression_path(self, mood: str) -> str | None:
-        rel = self.config.expressions.get(mood)
-        return self.asset_path(rel) if rel else None
+        anchor = self.config.expressions.get(mood)
+        return self.asset_path(anchor.path) if anchor else None
+
+    def expression_anchor(self, mood: str) -> tuple[str, float, float] | None:
+        """Return (full_path, x, y) for a mood's expression overlay, if any."""
+        anchor = self.config.expressions.get(mood)
+        if anchor is None:
+            return None
+        return self.asset_path(anchor.path), anchor.x, anchor.y
 
 
 def _read_json(path: str) -> dict:
@@ -62,8 +69,8 @@ def _verify_assets_exist(pack: LoadedCharPack) -> None:
     if closed and not os.path.isfile(closed):
         missing.append(f"eyes.closed -> {closed}")
 
-    for mood, rel in pack.config.expressions.items():
-        full = pack.asset_path(rel)
+    for mood, anchor in pack.config.expressions.items():
+        full = pack.asset_path(anchor.path)
         if not os.path.isfile(full):
             missing.append(f"expressions.{mood} -> {full}")
 

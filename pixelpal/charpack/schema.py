@@ -46,6 +46,13 @@ class EarsConfig:
 
 
 @dataclass
+class ExpressionAnchor:
+    path: str
+    x: float
+    y: float
+
+
+@dataclass
 class CharPackConfig:
     name: str
     display_name: str
@@ -54,7 +61,7 @@ class CharPackConfig:
     eyes: EyesConfig
     head_tilt: HeadTiltConfig
     ears: EarsConfig
-    expressions: dict[str, str] = field(default_factory=dict)
+    expressions: dict[str, ExpressionAnchor] = field(default_factory=dict)
 
 
 def _require(d: dict, key: str, ctx: str) -> Any:
@@ -121,17 +128,39 @@ def _parse_ears(d: dict | None) -> EarsConfig:
     return EarsConfig(enabled=bool(d.get("enabled", False)))
 
 
-def _parse_expressions(d: dict | None) -> dict[str, str]:
+def _parse_expressions(d: dict | None) -> dict[str, ExpressionAnchor]:
+    """Parse the expressions map.
+
+    Each mood maps to an anchor object: {"path": ..., "x": ..., "y": ...}.
+    x/y are the center point (in the same pixel coordinate space as the
+    eye sockets) where that expression sprite should be drawn — e.g. the
+    mouth position — so overlays don't default to the window's top-left
+    corner. x/y are optional and default to (0, 0) for callers that only
+    want the old top-left placement.
+    """
     if not d:
         return {}
     if not isinstance(d, dict):
         raise CharPackValidationError("'expressions' must be an object")
-    for key, value in d.items():
-        if not isinstance(value, str):
-            raise CharPackValidationError(
-                f"'expressions.{key}' must be a string path"
-            )
-    return dict(d)
+
+    result: dict[str, ExpressionAnchor] = {}
+    for mood, value in d.items():
+        ctx = f"expressions.{mood}"
+        if isinstance(value, str):
+            # Legacy shorthand: bare path string, anchored at (0, 0).
+            result[mood] = ExpressionAnchor(path=value, x=0.0, y=0.0)
+            continue
+        if not isinstance(value, dict):
+            raise CharPackValidationError(f"'{ctx}' must be a string or an object with path/x/y")
+        path = _require(value, "path", ctx)
+        if not isinstance(path, str):
+            raise CharPackValidationError(f"'{ctx}.path' must be a string")
+        result[mood] = ExpressionAnchor(
+            path=path,
+            x=float(value.get("x", 0.0)),
+            y=float(value.get("y", 0.0)),
+        )
+    return result
 
 
 def parse_config(raw: dict) -> CharPackConfig:

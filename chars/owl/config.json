@@ -2,9 +2,18 @@
   "name": "owl",
   "display_name": "Owl",
   "body": "body.gif",
+  "wait_seconds": 5,
   "eyes": {
-    "left":  { "x": 36, "y": 45, "radius": 7, "damping": 0.12 },
+    "left":  { "x": 36, "y": 46, "radius": 7, "damping": 0.12 },
     "right": { "x": 60, "y": 46, "radius": 7, "damping": 0.12 },
-    "pupil": "pupil.png"
+    "pupil": "pupil.png",
+    "closed": "eye_closed.png"
+  },
+  "expressions": {
+    "happy":   { "path": "expressions/happy.png",   "x": 48, "y": 62 },
+    "worried": { "path": "expressions/worried.png", "x": 48, "y": 62 },
+    "alert":   { "path": "expressions/alert.png",   "x": 48, "y": 62 },
+    "excited": { "path": "expressions/excited.png", "x": 48, "y": 62 },
+    "sleepy":  { "path": "expressions/sleepy.png",  "x": 48, "y": 62 }
   }
 }

@@ -13,8 +13,8 @@ novelty. PixelPal's body and eyes are **separate rendering layers**: the eyes
 track your cursor in real time with clamped, damped motion, so the pet reads
 as alive rather than as a video clip stuck to your screen.
 
-![PixelPal screenshot placeholder](docs/screenshots/desktop)
-![PixelPal screenshot placeholder](docs/screenshots/code)
+![PixelPal screenshot placeholder](docs/screenshots/desktop.png)
+![PixelPal screenshot placeholder](docs/screenshots/code.png)
 
 ## What makes this different from a typical desktop pet
 

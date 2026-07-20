@@ -15,8 +15,12 @@ as alive rather than as a video clip stuck to your screen.
 
 ![PixelPal screenshot placeholder](docs/screenshots/desktop.png)
 ![PixelPal screenshot placeholder](docs/screenshots/code.png)
-![PixelPal screenshot placeholder](docs/screenshots/reminder.png)
-![PixelPal screenshot placeholder](docs/screenshots/mood.png)
+
+<p float="left">
+  <img src="docs/screenshots/reminder.png" width="45%" />
+  <img src="docs/screenshots/mood.png" width="45%" />
+</p>
+
 
 ## What makes this different from a typical desktop pet
 
